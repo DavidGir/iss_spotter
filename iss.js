@@ -21,12 +21,17 @@ const fetchMyIP = function(callback) {
     if (error) {
       return callback(error, null);
     }
-    // If HTTP status code is valid; body of the response is parsed as JSON and ip address is extracted:
-    if (response.statusCode === 200) {
-      const ip = JSON.parse(body).ip;
-      // Callback null for the error and fetched ip address: 
-      callback(null, ip);
+
+    // if non-200 status, assume server error
+    if (response.statusCode !== 200) {
+      const msg = `Status Code ${response.statusCode} when fetching IP. Response: ${body}`;
+      callback(Error(msg), null);
+      return;
     }
+    
+    const ip = JSON.parse(body).ip;
+    // Callback null for the error and fetched ip address:
+    callback(null, ip);
   });
 };
 
