@@ -37,7 +37,7 @@ const fetchMyIP = function(callback) {
 
 const fetchCoordsByIP = function(ip, cb) {
   // Define variable to api endpoint to be able to fetch coordinates from ip:
-  const url2 = `https://ipwhois.is/${ip}`;
+  const url2 = `https://ipwho.is/${ip}`;
   
   request(url2, (error, response, body) => {
     if (error) {
