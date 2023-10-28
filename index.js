@@ -1,6 +1,7 @@
 // const { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes } = require('./iss');
 
 const { nextISSTimesForMyLocation } = require('./iss');
+const { printPassTimes } = require("./utilities");
 
 // fetchMyIP((error, ip) => {
 //   if (error) {
@@ -33,14 +34,15 @@ nextISSTimesForMyLocation((error, passTimes) => {
   if (error) {
     return console.log("It didn't work!", error);
   }
-  // success, print out the deets!
-  // Loop through passTimes:
-  for (const pass of passTimes) {
-    // Initialize variable to contain a date object with current date and time:
-    const date = new Date();
-    // Contain duration value from the pass object:
-    const duration = pass.duration;
-    // To capture details of each passes:
-    console.log(`Next pass at ${date} for ${duration} seconds!`);
-  }
+  printPassTimes(passTimes);
+  // // success, print out the deets!
+  // // Loop through passTimes:
+  // for (const pass of passTimes) {
+  //   // Initialize variable to contain a date object with current date and time:
+  //   const date = new Date();
+  //   // Contain duration value from the pass object:
+  //   const duration = pass.duration;
+  //   // To capture details of each passes:
+  //   console.log(`Next pass at ${date} for ${duration} seconds!`);
+  // }
 });
