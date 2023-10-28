@@ -35,4 +35,24 @@ const fetchMyIP = function(callback) {
   });
 };
 
-module.exports = { fetchMyIP };
+const fetchCoordsByIP = function(ip, cb) {
+  // Define variable to api endpoint to be able to fetch coordinates from ip:
+  const url2 = `https://ipwhois.is/${ip}`;
+  
+  request(url2, (error, response, body) => {
+    if (error) {
+      return cb(error, null);
+    }
+    if (response.statusCode !== 200) {
+      const msg = `Status Code ${response.statusCode} when fetching coordinates for IP. Response: ${body}`;
+      cb(Error(msg), null);
+      return;
+    }
+    const data = JSON.parse(body);
+    const latitude = data.latitude;
+    const longitude = data.longitude;
+    cb(null, { latitude, longitude });
+  });
+};
+
+module.exports = { fetchMyIP, fetchCoordsByIP };
