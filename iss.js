@@ -37,9 +37,9 @@ const fetchMyIP = function(callback) {
 
 const fetchCoordsByIP = function(ip, cb) {
   // Define variable to api endpoint to be able to fetch coordinates from ip:
-  const url2 = `https://ipwho.is/${ip}`;
+  const url = `https://ipwho.is/${ip}`;
   
-  request(url2, (error, response, body) => {
+  request(url, (error, response, body) => {
     if (error) {
       return cb(error, null);
     }
@@ -53,8 +53,49 @@ const fetchCoordsByIP = function(ip, cb) {
   
     const latitude = data.latitude;
     const longitude = data.longitude;
-    cb(null, { latitude, longitude });
+    const coords = { latitude, longitude };
+    cb(null, coords);
   });
 };
 
-module.exports = { fetchMyIP, fetchCoordsByIP };
+/**
+ * Makes a single API request to retrieve upcoming ISS fly over times the for the given lat/lng coordinates.
+ * Input:
+ *   - An object with keys `latitude` and `longitude`
+ *   - A callback (to pass back an error or the array of resulting data)
+ * Returns (via Callback):
+ *   - An error, if any (nullable)
+ *   - The fly over times as an array of objects (null if error). Example:
+ *     [ { risetime: 134564234, duration: 600 }, ... ]
+ */
+const fetchISSFlyOverTimes = function(coords, callback) {
+  // Define lat and long object as the coordinates:
+  const { latitude, longitude } = coords;
+  
+  const url = `https://iss-flyover.herokuapp.com/json/?lat=${latitude}&lon=${longitude}`;
+  
+  request(url, (error, response, body) => {
+    if (error) {
+      return callback(error, null);
+    }
+  
+    // if non-200 status, assume server error
+    if (response.statusCode !== 200) {
+      const msg = `Status Code ${response.statusCode} when fetching fly over times. Response: ${body}`;
+      callback(Error(msg), null);
+      return;
+    }
+
+    //ISS url has body object that contains flyovers under response key; if no body.response data on flyovers:
+    const parsedBody = JSON.parse(body);
+    if (!parsedBody.response) {
+      return callback(Error("No flyover times returned"), null);
+    }
+      
+    const flyovers = parsedBody.response;
+    // Callback null for the error and fetched fly overs:
+    callback(null, flyovers);
+  });
+};
+
+module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes };
